@@ -5,9 +5,6 @@ const checkAuth = require('../middleware/check-auth');
 
 const mysqlConnection = require('../database');
 
-//const URL_PARAMS = new URLSearchParams(window.location.search);
-//const TOKEN = URL_PARAMS.get('token');
-
 router.get('/', (req,res) => {
     mysqlConnection.query('select id,nombre,costo from cursos',(err,rows,fields) => {
         if(!err) {
@@ -34,18 +31,19 @@ router.get('/:id', (req,res) => {
     });  
 });
 
+
 router.post('/', checkAuth, (req,res) => {
-//router.post('/', (req,res) => {
-    const { id, nombre, costo } = req.body;
-    const query = 'insert into cursos values (?,?,?)'
+    //router.post('/', (req,res) => {
+        const { id, nombre, costo } = req.body;
+        const query = 'insert into cursos values (?,?,?)'
     //const query= 'call cursoAddOrEdit(?, ?, ?)';
-    mysqlConnection.query(query, [id,nombre,costo], (err, rows, fields) => {
-        if(!err) {
-            res.json({Mensaje: 'Curso agregado'});
-        } else {
-            console.log(err);
-        }
-    });
+        mysqlConnection.query(query, [id,nombre,costo], (err, rows, fields) => {
+            if(!err) {
+                res.json({Mensaje: 'Curso agregado'});
+            } else {
+                console.log(err);
+            }
+        });
 });
 
 router.put('/:id', checkAuth, (req, res) => {

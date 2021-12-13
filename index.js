@@ -2,13 +2,26 @@ require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const coursesRoutes =require('./routes/courses');
 const coursesUsers =require('./routes/users');
 
 const app = express();
 
+app.use(helmet());
+
 app.use(express.static('static'));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100
+});
+
+// only apply to requests that begin with /api/
+app.use("/api/", apiLimiter);
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/static/index.html'));
