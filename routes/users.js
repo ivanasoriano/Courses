@@ -3,10 +3,11 @@ const res = require('express/lib/response');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const checkAuth = require('../middleware/check-auth');
 
 const mysqlConnection = require('../database');
 
-/*router.get('/signup', (req,res) => {
+router.get('/',checkAuth, (req,res) => {
     mysqlConnection.query('select id,nombre,email,password from usuarios',(err,rows,fields) => {
         if(!err) {
             res.json(rows);
@@ -14,15 +15,15 @@ const mysqlConnection = require('../database');
             console.log(err);
         }
     });
-});*/
+});
 
 router.post('/login', (req,res) => {
     const { email, password } = req.body;
     const query = 'select id,email,password from usuarios where email=?'
     mysqlConnection.query(query, [email], (err, rows, fields) => {
         if(rows.length <1) {
-            res.json({Estado: 'Error de autenticación'});
-            //console.log(err);
+            res.json({Estado: 'Error de autenticación1'});
+            console.log(req.body.email);
         } else {
         bcrypt.compare(req.body.password,rows[0].password, (err , result) => {
             if(err) {
@@ -41,7 +42,7 @@ router.post('/login', (req,res) => {
                   );
                 res.json({Estado: 'Autenticación exitosa', token: token});
             } else {
-                res.json({Estado: 'Error de autenticación'});
+                res.json({Estado: 'Error de autenticación2'});
             }
             });
         }
