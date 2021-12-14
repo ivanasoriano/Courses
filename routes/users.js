@@ -35,7 +35,6 @@ router.post('/login', (req,res) => {
                         userId: rows[0].id
                     },
                     process.env.JWT_KEY,
-                    //'MySecretKey',
                     {
                         expiresIn: '60m'
                     }
