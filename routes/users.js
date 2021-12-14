@@ -22,7 +22,7 @@ router.post('/login', (req,res) => {
     const query = 'select id,email,password from usuarios where email=?'
     mysqlConnection.query(query, [email], (err, rows, fields) => {
         if(rows.length <1) {
-            res.json({Estado: 'Error de autenticación1'});
+            res.json({Estado: 'Error de autenticación'});
             console.log(req.body.email);
         } else {
         bcrypt.compare(req.body.password,rows[0].password, (err , result) => {
@@ -42,7 +42,7 @@ router.post('/login', (req,res) => {
                   );
                 res.json({Estado: 'Autenticación exitosa', token: token});
             } else {
-                res.json({Estado: 'Error de autenticación2'});
+                res.json({Estado: 'Error de autenticación'});
             }
             });
         }

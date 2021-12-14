@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
         req.userData = decoded;
         next();
     } catch (error){
-        res.json({Estado: 'Error de autenticación'});
+        res.json({Estado: 'Acceso Denegado'});
     }
     
 };
