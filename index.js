@@ -2,7 +2,6 @@ require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
-const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const coursesRoutes =require('./routes/courses');
@@ -10,7 +9,29 @@ const coursesUsers =require('./routes/users');
 
 const app = express();
 
+const session = require("express-session");
+const nosniff = require('dont-sniff-mimetype');
+const helmet = require("helmet");
+const fs = require("fs");
+const https = require("https");
+const httpsOptions = {
+    key: fs.readFileSync(path.resolve(__dirname, "./cert/server.key")),
+    cert: fs.readFileSync(path.resolve(__dirname, "./cert/server.crt"))
+};
+
 app.use(helmet());
+    
+// Evite la apertura de la página en un frame para protegerse del secuestro de clics
+app.use(helmet.frameguard()); 
+
+// Permite cargar recursos solo desde dominios incluidos en la lista blanca
+app.use(helmet.contentSecurityPolicy()); 
+
+// Permite la comunicación solo en HTTPS
+app.use(helmet.hsts());
+
+// Obliga al navegador a usar solo el tipo de contenido establecido en el encabezado de respuesta en lugar de adivinarlo
+app.use(nosniff());
 
 app.use(express.static('static'));
 
@@ -54,11 +75,34 @@ app.get('/oauth-callback', ({ query: { code } }, res) => {
 // Middlewares
 app.use(express.json());
 
+app.use(session({
+  secret: "session_cookie_secret_key_here",
+  saveUninitialized: true,
+  resave: true,
+  key: "sessionId",
+  cookie: {
+      httpOnly: true,
+       secure: true
+  }
+
+}));
+
 // Rutas (URLs)
 app.use('/courses',coursesRoutes);
 app.use('/users',coursesUsers);
 
-app.listen(3000);
+const port = process.env.PORT || 3000;
 // eslint-disable-next-line no-console
-console.log('App listening on port 3000');
+
+//app.listen(3000);
+//console.log('App listening on port 3000');
+
+// Inicializa servidor
+//app.listen(app.get('port'), () => {
+//    console.log('Server en puerto ',app.get('port'))
+//});
+
+https.createServer(httpsOptions, app).listen(port, () => {
+  console.log(`Server en puerto ${port}`);
+});
 
