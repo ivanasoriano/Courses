@@ -37,12 +37,10 @@ app.use(express.static('static'));
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100
+  max: 5
 });
 
-// only apply to requests that begin with /api/
-app.use("/api/", apiLimiter);
-
+app.use(apiLimiter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/static/index.html'));
